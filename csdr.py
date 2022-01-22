@@ -1,5 +1,5 @@
 """
-OpenWebRX csdr plugin: do the signal processing with csdr
+OpenWebRX csdr_s plugin: do the signal processing with csdr
 
     This file is part of OpenWebRX,
     an open-source SDR receiver software with a web UI.
@@ -44,8 +44,8 @@ class dsp:
         self.audio_compression = "none"
         self.fft_compression = "none"
         self.demodulator = "nfm"
-        self.name = "csdr"
-        self.format_conversion = "csdr convert_u8_f"
+        self.name = "csdr_s"
+        self.format_conversion = "csdr_s convert_u8_f"
         self.base_bufsize = 512
         self.nc_port = 4951
         self.csdr_dynamic_bufsize = False
@@ -54,7 +54,7 @@ class dsp:
         self.squelch_level = 0
         self.fft_averages = 50
         self.iqtee = False
-        self.iqtee2 = False
+        self.iqtee2 = False#freq=435000000,mod=nfm,sql=-150
         self.secondary_demodulator = None
         self.secondary_fft_size = 1024
         self.secondary_process_fft = None
@@ -65,39 +65,39 @@ class dsp:
 
     def chain(self,which):
         any_chain_base="nc -v 127.0.0.1 {nc_port} | "
-        if self.csdr_dynamic_bufsize: any_chain_base+="csdr setbuf {start_bufsize} | "
-        if self.csdr_through: any_chain_base+="csdr through | "
-        any_chain_base+=self.format_conversion+(" | " if  self.format_conversion!="" else "") ##"csdr flowcontrol {flowcontrol} auto 1.5 10 | "
+        if self.csdr_dynamic_bufsize: any_chain_base+="csdr_s setbuf {start_bufsize} | "
+        if self.csdr_through: any_chain_base+="csdr_s through | "
+        any_chain_base+=self.format_conversion+(" | " if  self.format_conversion!="" else "") ##"csdr_s flowcontrol {flowcontrol} auto 1.5 10 | "
         if which == "fft":
-            fft_chain_base = any_chain_base+"csdr fft_cc {fft_size} {fft_block_size} | " + \
-                ("csdr logpower_cf -70 | " if self.fft_averages == 0 else "csdr logaveragepower_cf -70 {fft_size} {fft_averages} | ") + \
-                "csdr fft_exchange_sides_ff {fft_size}"
+            fft_chain_base = any_chain_base+"csdr_s fft_cc {fft_size} {fft_block_size} | " + \
+                ("csdr_s logpower_cf -70 | " if self.fft_averages == 0 else "csdr_s logaveragepower_cf -70 {fft_size} {fft_averages} | ") + \
+                "csdr_s fft_exchange_sides_ff {fft_size}"
             if self.fft_compression=="adpcm":
-                return fft_chain_base+" | csdr compress_fft_adpcm_f_u8 {fft_size}"
+                return fft_chain_base+" | csdr_s compress_fft_adpcm_f_u8 {fft_size}"
             else:
                 return fft_chain_base
-        chain_begin=any_chain_base+"csdr shift_addition_cc --fifo {shift_pipe} | csdr fir_decimate_cc {decimation} {ddc_transition_bw} HAMMING | csdr bandpass_fir_fft_cc --fifo {bpf_pipe} {bpf_transition_bw} HAMMING | csdr squelch_and_smeter_cc --fifo {squelch_pipe} --outfifo {smeter_pipe} 5 1 | "
+        chain_begin=any_chain_base+"csdr_s shift_addition_cc --fifo {shift_pipe} | csdr_s fir_decimate_cc {decimation} {ddc_transition_bw} HAMMING | csdr_s bandpass_fir_fft_cc --fifo {bpf_pipe} {bpf_transition_bw} HAMMING | csdr_s squelch_and_smeter_cc --fifo {squelch_pipe} --outfifo {smeter_pipe} 5 1 | "
         if self.secondary_demodulator:
-            chain_begin+="csdr tee {iqtee_pipe} | "
-            chain_begin+="csdr tee {iqtee2_pipe} | " 
+            chain_begin+="csdr_s tee {iqtee_pipe} | "
+            chain_begin+="csdr_s tee {iqtee2_pipe} | " 
         chain_end = ""
         if self.audio_compression=="adpcm":
-            chain_end = " | csdr encode_ima_adpcm_i16_u8"
-        if which == "nfm": return chain_begin + "csdr fmdemod_quadri_cf | csdr limit_ff | csdr old_fractional_decimator_ff {last_decimation} | csdr deemphasis_nfm_ff 11025 | csdr fastagc_ff 1024 | csdr convert_f_s16"+chain_end
-        elif which == "am": return chain_begin + "csdr amdemod_cf | csdr fastdcblock_ff | csdr old_fractional_decimator_ff {last_decimation} | csdr agc_ff | csdr limit_ff | csdr convert_f_s16"+chain_end
-        elif which == "ssb": return chain_begin + "csdr realpart_cf | csdr old_fractional_decimator_ff {last_decimation} | csdr agc_ff | csdr limit_ff | csdr convert_f_s16"+chain_end
+            chain_end = " | csdr_s encode_ima_adpcm_i16_u8"
+        if which == "nfm": return chain_begin + "csdr_s fmdemod_quadri_cf | csdr_s limit_ff | csdr_s old_fractional_decimator_ff {last_decimation} | csdr_s deemphasis_nfm_ff 11025 | csdr_s fastagc_ff 1024 | csdr_s convert_f_s16"+chain_end
+        elif which == "am": return chain_begin + "csdr_s amdemod_cf | csdr_s fastdcblock_ff | csdr_s old_fractional_decimator_ff {last_decimation} | csdr_s agc_ff | csdr_s limit_ff | csdr_s convert_f_s16"+chain_end
+        elif which == "ssb": return chain_begin + "csdr_s realpart_cf | csdr_s old_fractional_decimator_ff {last_decimation} | csdr_s agc_ff | csdr_s limit_ff | csdr_s convert_f_s16"+chain_end
 
     def secondary_chain(self, which):
         secondary_chain_base="cat {input_pipe} | "
         if which == "fft":
-            return secondary_chain_base+"csdr realpart_cf | csdr fft_fc {secondary_fft_input_size} {secondary_fft_block_size} | csdr logpower_cf -70 " + (" | csdr compress_fft_adpcm_f_u8 {secondary_fft_size}" if self.fft_compression=="adpcm" else "")
+            return secondary_chain_base+"csdr_s realpart_cf | csdr_s fft_fc {secondary_fft_input_size} {secondary_fft_block_size} | csdr_s logpower_cf -70 " + (" | csdr_s compress_fft_adpcm_f_u8 {secondary_fft_size}" if self.fft_compression=="adpcm" else "")
         elif which == "bpsk31":
-            return secondary_chain_base + "csdr shift_addition_cc --fifo {secondary_shift_pipe} | " + \
-                    "csdr bandpass_fir_fft_cc $(csdr '=-(31.25)/{if_samp_rate}') $(csdr '=(31.25)/{if_samp_rate}') $(csdr '=31.25/{if_samp_rate}') | " + \
-                    "csdr simple_agc_cc 0.001 0.5 | " + \
-                    "csdr timing_recovery_cc GARDNER {secondary_samples_per_bits} 0.5 2 --add_q | " + \
-                    "CSDR_FIXED_BUFSIZE=1 csdr dbpsk_decoder_c_u8 | " + \
-                    "CSDR_FIXED_BUFSIZE=1 csdr psk31_varicode_decoder_u8_u8"
+            return secondary_chain_base + "csdr_s shift_addition_cc --fifo {secondary_shift_pipe} | " + \
+                    "csdr_s bandpass_fir_fft_cc $(csdr_s '=-(31.25)/{if_samp_rate}') $(csdr_s '=(31.25)/{if_samp_rate}') $(csdr_s '=31.25/{if_samp_rate}') | " + \
+                    "csdr_s simple_agc_cc 0.001 0.5 | " + \
+                    "csdr_s timing_recovery_cc GARDNER {secondary_samples_per_bits} 0.5 2 --add_q | " + \
+                    "CSDR_FIXED_BUFSIZE=1 csdr_s dbpsk_decoder_c_u8 | " + \
+                    "CSDR_FIXED_BUFSIZE=1 csdr_s psk31_varicode_decoder_u8_u8"
 
     def set_secondary_demodulator(self, what):
         self.secondary_demodulator = what
@@ -129,7 +129,7 @@ class dsp:
 
     def start_secondary_demodulator(self):
         if(not self.secondary_demodulator): return
-        print "[openwebrx] starting secondary demodulator from IF input sampled at %d"%self.if_samp_rate()
+        print("[openwebrx] starting secondary demodulator from IF input sampled at %d"%self.if_samp_rate())
         secondary_command_fft=self.secondary_chain("fft")
         secondary_command_demod=self.secondary_chain(self.secondary_demodulator)
         self.try_create_pipes(self.secondary_pipe_names, secondary_command_demod + secondary_command_fft)
@@ -150,19 +150,19 @@ class dsp:
             if_samp_rate=self.if_samp_rate()
             )
 
-        print "[openwebrx-dsp-plugin:csdr] secondary command (fft) =", secondary_command_fft
-        print "[openwebrx-dsp-plugin:csdr] secondary command (demod) =", secondary_command_demod
+        print("[openwebrx-dsp-plugin:csdr] secondary command (fft) =", secondary_command_fft)
+        print("[openwebrx-dsp-plugin:csdr] secondary command (demod) =", secondary_command_demod)
         #code.interact(local=locals())
         my_env=os.environ.copy()
         #if self.csdr_dynamic_bufsize: my_env["CSDR_DYNAMIC_BUFSIZE_ON"]="1";
         if self.csdr_print_bufsizes: my_env["CSDR_PRINT_BUFSIZES"]="1";
         self.secondary_process_fft = subprocess.Popen(secondary_command_fft, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setpgrp, env=my_env)
-        print "[openwebrx-dsp-plugin:csdr] Popen on secondary command (fft)"
+        print("[openwebrx-dsp-plugin:csdr] Popen on secondary command (fft)")
         self.secondary_process_demod = subprocess.Popen(secondary_command_demod, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setpgrp, env=my_env) #TODO digimodes
-        print "[openwebrx-dsp-plugin:csdr] Popen on secondary command (demod)" #TODO digimodes
+        print("[openwebrx-dsp-plugin:csdr] Popen on secondary command (demod)") #TODO digimodes
         self.secondary_processes_running = True
 
-        #open control pipes for csdr and send initialization data
+        #open control pipes for csdr_s and send initialization data
         # print "==========> 1"
         if self.secondary_shift_pipe != None: #TODO digimodes
             # print "==========> 2", self.secondary_shift_pipe
@@ -313,7 +313,7 @@ class dsp:
             pipe_path = getattr(self,pipe_name,None)
             if pipe_path:
                 try: os.unlink(pipe_path)
-                except Exception as e: print "[openwebrx-dsp-plugin:csdr] try_delete_pipes() ::", e
+                except Exception as e: print("[openwebrx-dsp-plugin:csdr] try_delete_pipes() ::", e)
 
     def set_pipe_nonblocking(self, pipe):
         flags = fcntl.fcntl(pipe, fcntl.F_GETFL)
@@ -354,7 +354,7 @@ class dsp:
             flowcontrol=int(self.samp_rate*2), start_bufsize=self.base_bufsize*self.decimation, nc_port=self.nc_port, \
             squelch_pipe=self.squelch_pipe, smeter_pipe=self.smeter_pipe, iqtee_pipe=self.iqtee_pipe, iqtee2_pipe=self.iqtee2_pipe )
 
-        print "[openwebrx-dsp-plugin:csdr] Command =",command
+        print("[openwebrx-dsp-plugin:csdr] Command =",command)
         #code.interact(local=locals())
         my_env=os.environ.copy()
         if self.csdr_dynamic_bufsize: my_env["CSDR_DYNAMIC_BUFSIZE_ON"]="1";
@@ -362,7 +362,7 @@ class dsp:
         self.process = subprocess.Popen(command, stdout=subprocess.PIPE, shell=True, preexec_fn=os.setpgrp, env=my_env)
         self.running = True
 
-        #open control pipes for csdr and send initialization data
+        #open control pipes for csdr_s and send initialization data
         if self.bpf_pipe != None:
             self.bpf_pipe_file=open(self.bpf_pipe,"w")
             self.set_bpf(self.low_cut,self.high_cut)
@@ -421,4 +421,7 @@ class dsp:
 
     def __del__(self):
         self.stop()
-        del(self.process)
+        try:
+            del(self.process)
+        except:
+            pass

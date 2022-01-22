@@ -1,10 +1,10 @@
-# OpenWebRX
+# simple OpenWebRX
 
-OpenWebRX is a multi-user SDR receiver software with a web interface.
+simple OpenWebRX is a multi-user SDR receiver software with a web interface.
+  forked by OE2LSP and ported to python 3
 
 ----
 
-### ⚠️ From 2019-12-29 OpenWebRX development is discontinued. ⚠️
 
 I'm would like to say a big thanks to everyone who supported me during this project, including those who contributed either code or donations. It has been a very fruitful 6 years, but now it's time to move on to other projects. See also my [blog](https://blog.sdr.hu) about that.  
 
@@ -58,26 +58,29 @@ It has the following features:
 **News (2017-07-12)**
 - OpenWebRX now has a BPSK31 demodulator and a 3D waterfall display.
 
+**News (2022-01-22)**
+- working with >python3.8 
+- multi sdr profiles (e.g. switching bands on same SDR)
+- as it is a fork, renamed to simple_openwebrx
+
 > When upgrading OpenWebRX, please make sure that you also upgrade *csdr*!
 
-## OpenWebRX servers on SDR.hu
 
-[SDR.hu](http://sdr.hu) is a site which lists the active, public OpenWebRX servers. Your receiver [can also be part of it](http://sdr.hu/openwebrx), if you want.
-
-![sdr.hu](http://blog.sdr.hu/images/openwebrx/screenshot-sdrhu.png)
 
 ## Setup
 
-OpenWebRX currently requires Linux and python 2.7 to run. 
+OpenWebRX currently requires Linux and >python3.8 to run. 
 
 First you will need to install the dependencies:
 
-- <a href="https://github.com/simonyiszk/csdr">libcsdr</a>
+- <a href="https://github.com/oe2lsp/csdr">libcsdr</a>
 - <a href="http://sdr.osmocom.org/trac/wiki/rtl-sdr">rtl-sdr</a>
+- python3-websockets
+- python3-psutil
 
 After cloning this repository and connecting an RTL-SDR dongle to your computer, you can run the server:
 
-	python openwebrx.py
+	python3 openwebrx.py
 
 You can now open the GUI at <a href="http://localhost:8073">http://localhost:8073</a>.
 

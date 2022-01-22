@@ -184,8 +184,9 @@ input[type=range]:focus::-ms-fill-upper
 #webrx-top-logo
 {
 	position: absolute;
-	top: 12px;
-	left: 15px;
+	top: 6px;
+	left: 6px;
+	width: 170px;
 }
 
 #webrx-ha5kfu-top-logo
@@ -193,6 +194,7 @@ input[type=range]:focus::-ms-fill-upper
 	position: absolute;
 	top: 15px;
 	right: 15px;
+	width: 170px;
 }
 
 #webrx-top-photo
@@ -221,7 +223,7 @@ input[type=range]:focus::-ms-fill-upper
 
 #webrx-top-photo-clip
 {
-	max-height: 350px;
+	max-height: 65px; /*was 350px => KISS*/
 	overflow: hidden;
 	position: relative;
 }
@@ -315,10 +317,10 @@ input[type=range]:focus::-ms-fill-upper
 	overflow: hidden;
 	cursor:pointer;
 	position: absolute;
-	left: 350px;
+	left: 185px;
 	top: 13px;
 	font-family: "DejaVu Sans", Verdana, Geneva, sans-serif;
-	color: #909090;
+	color: #f0f0f0;
 	font-size: 11pt;
 	font-weight: bold;
 }
@@ -329,9 +331,9 @@ input[type=range]:focus::-ms-fill-upper
 	overflow: hidden;
 	cursor:pointer;
 	font-size: 10pt;
-	color: #909090;
+	color: #f0f0f0;
 	position: absolute;
-	left: 350px;
+	left: 185px;
 	top: 34px;
 }
 
@@ -719,7 +721,7 @@ img.openwebrx-mirror-img
 #openwebrx-main-buttons
 {
 	position: absolute;
-	right: 133px;
+	right: 0px;
 	top: 3px;
 	margin:0;
 	color: white;
@@ -841,7 +843,7 @@ img.openwebrx-mirror-img
     transition: width 500ms, left 500ms;
 }
 
-#openwebrx-secondary-demod-listbox
+#openwebrx-secondary-demod-listbox, .openwebrx-select-listbox
 {
 	width: 201px;
 	height: 27px;
@@ -859,7 +861,7 @@ img.openwebrx-mirror-img
 	padding-left:3px;
 }
 
-#openwebrx-secondary-demod-listbox option
+#openwebrx-secondary-demod-listbox option, .openwebrx-select-listbox option
 {
 	border-width: 0px;
 	background-color: #373737;

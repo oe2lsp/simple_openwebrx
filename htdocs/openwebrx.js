@@ -79,10 +79,11 @@ is_chrome = /Chrome/.test(navigator.userAgent);
 
 function init_rx_photo()
 {
-	e("webrx-top-photo-clip").style.maxHeight=rx_photo_height.toString()+"px";
-	window.setTimeout(function() { animate(e("webrx-rx-photo-title"),"opacity","",1,0,1,500,30); },1000);
-	window.setTimeout(function() { animate(e("webrx-rx-photo-desc"),"opacity","",1,0,1,500,30); },1500);
-	window.setTimeout(function() { close_rx_photo() },2500);
+	//e("webrx-top-photo-clip").style.maxHeight=rx_photo_height.toString()+"px";
+	//window.setTimeout(function() { animate(e("webrx-rx-photo-title"),"opacity","",1,0,1,500,30); },10);
+	//window.setTimeout(function() { animate(e("webrx-rx-photo-desc"),"opacity","",1,0,1,500,30); },15);
+	//window.setTimeout(function() { close_rx_photo() },25);
+	close_rx_photo()
 }
 
 dont_toggle_rx_photo_flag=0;
@@ -102,7 +103,8 @@ function toggle_rx_photo()
 function close_rx_photo()
 {
 	rx_photo_state=0;
-	animate_to(e("webrx-top-photo-clip"),"maxHeight","px",67,0.93,1000,60,function(){resize_waterfall_container(true);});
+	//animate_to(e("webrx-top-photo-clip"),"maxHeight","px",67,0.93,1000,60,function(){resize_waterfall_container(true);});
+	e("webrx-top-photo-clip").style.maxHeight="65px"
 	e("openwebrx-rx-details-arrow-down").style.display="block";
 	e("openwebrx-rx-details-arrow-up").style.display="none";
 }
@@ -1246,6 +1248,9 @@ function on_ws_recv(evt)
 					case "max_clients":
 						max_clients_num=parseInt(param[1]);
 						break;
+					case "sdr":
+						sdr_update(parseInt(param[1]))
+						break;
 					case "s":
 						smeter_level=parseFloat(param[1]);
 						setSmeterAbsoluteValue(smeter_level);
@@ -1627,6 +1632,7 @@ function audio_init()
 	if(starting_mute) toggleMute();
 
 	if(audio_client_resampling_factor==0) return; //if failed to find a valid resampling factor...
+	toggle_panel('openwebrx-panel-status');
 
 	audio_debug_time_start=(new Date()).getTime();
 	audio_debug_time_last_start=audio_debug_time_start;
@@ -1669,7 +1675,7 @@ function audio_init()
 			//animate(e("openwebrx-panel-log"),"opacity","",1,0,0.9,1000,60);
 			//window.setTimeout(function(){toggle_panel("openwebrx-panel-log");e("openwebrx-panel-log").style.opacity="1";},1200)
 		}
-	},2000);
+	},200);
 
 }
 
@@ -1680,12 +1686,15 @@ function on_ws_closed()
 		audio_node.disconnect();
 	}
 	catch (dont_care) {}
-	divlog("WebSocket has closed unexpectedly. Please reload the page.", 1);
+	divlog("WebSocket has closed unexpectedly. Reconnectin in a few seconds...", 1);
+	//todo reconnect
+	setTimeout(openwebrx_init(), 1000);
 }
 
 function on_ws_error(event)
 {
 	divlog("WebSocket error.",1);
+	//setTimeout(openwebrx_init(), 1000);
 }
 
 String.prototype.startswith=function(str){ return this.indexOf(str) == 0; }; //http://stackoverflow.com/questions/646628/how-to-check-if-a-string-startswith-another-string
@@ -2184,9 +2193,15 @@ function openwebrx_resize()
 
 function openwebrx_init()
 {
+	//for reconnect 
+	audio_initialized=0;
+	audio_buffering = false;
+
+
 	if(ios||is_chrome) e("openwebrx-big-grey").style.display="table-cell";
 	(opb=e("openwebrx-play-button-text")).style.marginTop=(window.innerHeight/2-opb.clientHeight/2).toString()+"px";
-	init_rx_photo();
+	select_sdr_init()
+	init_rx_photo();  //initial photo disabled in css, KISS :)
 	open_websocket();
     secondary_demod_init();
 	place_panels(first_show_panel);
@@ -2197,6 +2212,34 @@ function openwebrx_init()
 	//Synchronise volume with slider
 	updateVolume();
 	waterfallColorsDefault();
+}
+
+function select_sdr_init()
+{
+	//for each sdr_labels add entry to 
+    select = document.getElementById('sdr-select');
+    select.innerHTML= "";
+    sdr_cnt=0
+	for (let i=0; i<sdr_labels.length; i++) {
+		var opt = document.createElement('option');
+    	opt.value = i;
+    	opt.innerHTML = sdr_labels[i];
+    	select.appendChild(opt);
+	}
+}
+
+function sdr_change()
+{
+	//send sdr:id over ws
+    select = document.getElementById('sdr-select');
+	value = select.selectedIndex	
+	webrx_set_param("sdr", value)
+}
+
+function sdr_update(id)
+{
+    select = document.getElementById('sdr-select');
+	select.selectedIndex = id
 }
 
 function iosPlayButtonClick()

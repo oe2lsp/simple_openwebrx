@@ -41,7 +41,7 @@ max_clients=20
 
 # ==== Web GUI configuration ====
 receiver_name="[Callsign]"
-receiver_location="Budapest, Hungary"
+receiver_location="QTH"
 receiver_qra="JN97ML"
 receiver_asl=200
 receiver_ant="Longwire"
@@ -54,8 +54,8 @@ photo_desc="""
 You can add your own background photo and receiver information.<br />
 Receiver is operated by: <a href="mailto:%[RX_ADMIN]">%[RX_ADMIN]</a><br/>
 Device: %[RX_DEVICE]<br />
-Antenna: %[RX_ANT]<br />
-Website: <a href="http://localhost" target="_blank">http://localhost</a>
+Antenna: %[RX_ANT]<br /><br />
+OpenWebRX forked from ha5kfu, updated to python3
 """
 
 # ==== sdr.hu listing ====
@@ -70,12 +70,24 @@ sdrhu_public_listing = False
 fft_fps=9
 fft_size=4096 #Should be power of 2
 fft_voverlap_factor=0.3 #If fft_voverlap_factor is above 0, multiple FFTs will be used for creating a line on the diagram.
+start_rtl_command=[] #init list of start commands.
 
-# samp_rate = 250000
-samp_rate = 2400000
-center_freq = 144250000
-rf_gain = 5 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
+
+##### START SDR CONFIG ###############
+samp_rate = [2400000,2400000]
+center_freq =  [144250000,100000000]
+rf_gain = 30 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
 ppm = 0
+shown_center_freq = [center_freq[0],center_freq[1]] #you can change this if you use an upconverter
+
+#sdr
+sdr_labels=['2m RTL-SDR','test RTL-SDR']
+start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=center_freq[0], samp_rate=samp_rate[1], ppm=ppm))
+start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=center_freq[1], samp_rate=samp_rate[1], ppm=ppm))
+##### END SDR CONFIG ###############
+
+
+format_conversion="csdr_s convert_u8_f"
 
 audio_compression="adpcm" #valid values: "adpcm", "none"
 fft_compression="adpcm" #valid values: "adpcm", "none"
@@ -93,7 +105,7 @@ Note: if you experience audio underruns while CPU usage is 100%, you can:
 - limit the number of users by decreasing `max_clients`.
 """
 
-# ==== I/Q sources ====
+# ==== I/Q sources ==== (examples), add above if needed
 # (Uncomment the appropriate by removing # characters at the beginning of the corresponding lines.)
 
 #################################################################################################
@@ -104,9 +116,17 @@ Note: if you experience audio underruns while CPU usage is 100%, you can:
 # You can use other SDR hardware as well, by giving your own command that outputs the I/Q samples... Some examples of configuration are available here (default is RTL-SDR):
 
 # >> RTL-SDR via rtl_sdr
-start_rtl_command="rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=center_freq, samp_rate=samp_rate, ppm=ppm)
-format_conversion="csdr convert_u8_f"
 
+
+
+### ADOPT BEFORE START ####
+# center_freq
+# samp_rate
+
+# sdr_labels
+
+
+#####some examples #####
 #lna_gain=8
 #rf_amp=1
 #start_rtl_command="hackrf_transfer -s {samp_rate} -f {center_freq} -g {rf_gain} -l{lna_gain} -a{rf_amp} -r-".format(rf_gain=rf_gain, center_freq=center_freq, samp_rate=samp_rate, ppm=ppm, rf_amp=rf_amp, lna_gain=lna_gain)
@@ -155,8 +175,6 @@ To use a HackRF, compile the HackRF host tools from its "stdout" branch:
 #format_conversion=""
 
 # ==== Misc settings ====
-
-shown_center_freq = center_freq #you can change this if you use an upconverter
 
 client_audio_buffer_size = 5
 #increasing client_audio_buffer_size will:
@@ -207,10 +225,3 @@ csdr_through = False # Setting this True will print out how much data is going i
 
 nmux_memory = 50 #in megabytes. This sets the approximate size of the circular buffer used by nmux.
 
-#Look up external IP address automatically from icanhazip.com, and use it as [server_hostname]
-"""
-print "[openwebrx-config] Detecting external IP address..."
-import urllib2
-server_hostname=urllib2.urlopen("http://icanhazip.com").read()[:-1]
-print "[openwebrx-config] External IP address detected:", server_hostname
-"""
