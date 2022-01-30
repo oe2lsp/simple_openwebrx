@@ -93,8 +93,8 @@ import signal
 import socket
 from functools import reduce
 
-try: import sdrhu
-except: sdrhu=False
+#try: import sdrhu
+#except: sdrhu=False
 avatar_ctime=""
 
 #httpnew 202201
@@ -870,7 +870,9 @@ async def process_request(sever_root, path, request_headers):
                     ("%[DIGIMODES_ENABLE]",("true" if cfg.digimodes_enable else "false")),
                     ("%[MATHBOX_WATERFALL_FRES]",str(cfg.mathbox_waterfall_frequency_resolution)),
                     ("%[MATHBOX_WATERFALL_THIST]",str(cfg.mathbox_waterfall_history_length)),
-                    ("%[MATHBOX_WATERFALL_COLORS]",cfg.mathbox_waterfall_colors)
+                    ("%[MATHBOX_WATERFALL_COLORS]",cfg.mathbox_waterfall_colors),
+                    ("%[HTML_HEAD]",cfg.receiver_html_head),
+                    ("%[HTML_CONTENT]",cfg.receiver_html_content)
                 )
                 data=data.decode()
                 for rule in replace_dictionary:                        
