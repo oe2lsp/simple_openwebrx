@@ -39,25 +39,27 @@ TODO
             //start new sdr
 
 
-        digi modes, digi speach 
-        
+        digi modes, digi speech 
+            wfm, dmr, ysf, freedv,
+            bpsk31, bpsk61, ft8 ft4 jt65 jt9 wspr packet pocsag
+
         lower latency
             clean buffer if buffer too long? (js) => config first
             other codec?
 
     frontend
-        multible sdr [settings]
+        //multible sdr [settings]
             //auto-restart WS should do the trick
-            frontend band selection
-                select bands with start message in gui
+            //frontend band selection
+            //    select bands with start message in gui
 
         //cleanup
-        hide log + status
-        mouse / keyboard ctrl
-            left right arrows (mouse wheel = zoom)
-        mobile theme
-
-
+        //hide log + status
+        //mouse / keyboard ctrl
+        //    left right arrows (mouse wheel = zoom)
+        //mobile theme
+        multitouch zoom
+            https://dev.to/danburzo/pinch-me-i-m-zooming-gestures-in-the-dom-a0e
 """
 sw_version="v0.17"
 #0.15 (added nmux)
@@ -166,6 +168,8 @@ def start_sdr():
             return False
         print("[openwebrx-main] nmux_bufsize = %d, nmux_bufcnt = %d" % (nmux_bufsize, nmux_bufcnt))
         rtl_start= cfg.start_rtl_command[sdr_selected] + "| nmux_s --bufsize %d --bufcnt %d --port %d --address 127.0.0.1" % (nmux_bufsize, nmux_bufcnt, cfg.iq_server_port)
+        print("center_freq:"+str(cfg.shown_center_freq[sdr_selected]))
+        print("sampling_rate:"+str(cfg.samp_rate[sdr_selected]))
         #rtl_thread=threading.Thread(target = lambda:subprocess.Popen(cfg.start_rtl_command[0], shell=True),  args=())
         #rtl = multiprocessing.Process(target=os.system,args=('rtl_sdr -s 2400000 -f 144250000 -p 0 -g 30 -| nmux --bufsize 122880 --bufcnt 407 --port 4951 --address 127.0.0.1',))
 
@@ -824,8 +828,8 @@ async def process_request(sever_root, path, request_headers):
             anyStringsPresentInUserAgent=lambda a: reduce(lambda x,y:x or y, [user_agent.count(b) for b in a], False)
             blacklist=["Chrome","Firefox","Googlebot","iPhone","iPad","iPod"]
 #            if extension == "wrx" and ( (not anyStringsPresentInUserAgent(("Chrome","Firefox","Googlebot","iPhone","iPad","iPod"))) if 'User-Agent' in request_headers._list[] else True ) and (not request_param.count("unsupported")):
-            if extension == "wrx" and ( not [el for el in blacklist if(el in user_agent)]):
-                return send_302("upgrade.html")
+            #if extension == "wrx" and ( not [el for el in blacklist if(el in user_agent)]):
+            #    return send_302("upgrade.html")
             if extension == "wrx":
                 cleanup_clients(False)
                 if cfg.max_clients<=len(clients):

@@ -48,15 +48,16 @@
         <script src="jquery.nanoscroller.js"></script>
         <link rel="stylesheet" type="text/css" href="nanoscroller.css" />
         <link rel="stylesheet" type="text/css" href="openwebrx.css" />
-        <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="utf-8">
     </head>
     <body onload="openwebrx_init();">
 <div id="webrx-page-container">
     <div id="webrx-top-container">
         <div id="webrx-top-photo-clip">
             <img src="gfx/openwebrx-top-photo.png" id="webrx-top-photo"/>
-            <div id="webrx-rx-photo-title">%[RX_PHOTO_TITLE]</div>
-            <div id="webrx-rx-photo-desc">%[RX_PHOTO_DESC]<br /> Loc: %[RX_QRA], ASL: %[RX_ASL] m
+	        <div id="webrx-rx-photo-title">%[RX_PHOTO_TITLE]</div>
+                <div id="webrx-rx-photo-desc">%[RX_PHOTO_DESC]<br /> Loc: %[RX_QRA], ASL: %[RX_ASL] m
 </div>
         </div>
         <div id="webrx-top-bar-background" class="webrx-top-bar-parts"></div>
@@ -65,9 +66,12 @@
             <!--<a href="http://ha5kfu.sch.bme.hu/" target="_blank"><img src="gfx/openwebrx-ha5kfu-top-logo.png" id="webrx-ha5kfu-top-logo" /></a>-->
             <!--<img id="webrx-rx-avatar-background" src="gfx/openwebrx-avatar-background.png" onclick="toggle_rx_photo();"/>
             <img id="webrx-rx-avatar" src="gfx/openwebrx-avatar.png" onclick="toggle_rx_photo();"/>-->
-            <div id="webrx-rx-title" onclick="toggle_rx_photo();">%[RX_TITLE]</div>
-            <div id="webrx-rx-desc" onclick="toggle_rx_photo();">%[RX_LOC] </div>
-            %[HTML_CONTENT]
+            
+	    <div id="webrx-rx-head-desc">
+	        <div id="webrx-rx-title" onclick="toggle_rx_photo();">%[RX_TITLE]</div>
+                <div id="webrx-rx-desc" onclick="toggle_rx_photo();">%[RX_LOC] </div>
+	    </div>
+	    %[HTML_CONTENT]
             
             <div id="openwebrx-rx-details-arrow">
                 <a id="openwebrx-rx-details-arrow-up" onclick="toggle_rx_photo();"><img src="gfx/openwebrx-rx-details-arrow-up.png" /></a>
@@ -92,8 +96,8 @@
                 <!-- add canvas here by javascript -->
             </div>
             <div id="openwebrx-panels-container">
-                <div class="openwebrx-panel" id="openwebrx-panel-receiver" data-panel-name="client-params" data-panel-pos="right" data-panel-order="0" data-panel-size="259,115">
-                    <div id="webrx-actual-freq">---.--- MHz</div>
+		    <div class="openwebrx-panel" id="openwebrx-panel-receiver" data-panel-name="client-params" data-panel-pos="right" data-panel-order="0" data-panel-size="259,115"><!-- LSP -->
+                    <div id="webrx-actual-freq">---.--- MHz</div><div id="webrx-fullsceen" class="openwebrx-button" onclick="fullscreen()">⛶</div>
                     <div id="webrx-mouse-freq">---.--- MHz</div>
                     <div class="openwebrx-panel-line">
                         &nbsp;SDR:&nbsp; 

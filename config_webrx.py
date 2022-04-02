@@ -60,7 +60,7 @@ OpenWebRX forked from ha5kfu, updated to python3
 
 #add custrom stuff to frontent like chat, and keep complient to upstream code
 receiver_html_head="<!--include js or css -->"
-receiver_html_content="<custom html code>" 
+receiver_html_content="<!--custom html code in header region-->" 
 
 # ==== sdr.hu listing ====
 # If you want your ham receiver to be listed publicly on sdr.hu, then take the following steps:
