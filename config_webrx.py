@@ -85,13 +85,12 @@ rf_gain = 20 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain m
 ppm = 0
 
 ##### START SDR CONFIG ###############
-for cnt in range(70,1000):
-    f=1e6*cnt
-    samp_rate.append(2048000)
-    center_freq.append(f)
-    shown_center_freq.append(f) #you can change this if you use an upconverter
-    sdr_labels.append(str(cnt)+" MHz")
-    start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=f, samp_rate=2048000, ppm=ppm))
+f=1e6*145
+samp_rate.append(2048000)
+center_freq.append(f)
+shown_center_freq.append(f) #you can change this if you use an upconverter
+sdr_labels.append("145 MHz")
+start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=f, samp_rate=2048000, ppm=ppm))
 
 
 ##### END SDR CONFIG ###############
