@@ -77,17 +77,23 @@ fft_voverlap_factor=0.3 #If fft_voverlap_factor is above 0, multiple FFTs will b
 start_rtl_command=[] #init list of start commands.
 
 
-##### START SDR CONFIG ###############
-samp_rate = [2400000,2400000]
-center_freq =  [144250000,100000000]
-rf_gain = 30 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
+samp_rate = []
+center_freq =  []
+shown_center_freq = [] #you can change this if you use an upconverter
+sdr_labels=[]
+rf_gain = 20 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
 ppm = 0
-shown_center_freq = [center_freq[0],center_freq[1]] #you can change this if you use an upconverter
 
-#sdr
-sdr_labels=['2m RTL-SDR','test RTL-SDR']
-start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=center_freq[0], samp_rate=samp_rate[1], ppm=ppm))
-start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=center_freq[1], samp_rate=samp_rate[1], ppm=ppm))
+##### START SDR CONFIG ###############
+for cnt in range(70,1000):
+    f=1e6*cnt
+    samp_rate.append(2048000)
+    center_freq.append(f)
+    shown_center_freq.append(f) #you can change this if you use an upconverter
+    sdr_labels.append(str(cnt)+" MHz")
+    start_rtl_command.append("rtl_sdr -s {samp_rate} -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=f, samp_rate=2048000, ppm=ppm))
+
+
 ##### END SDR CONFIG ###############
 
 
