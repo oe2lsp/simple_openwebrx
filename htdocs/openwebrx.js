@@ -1379,7 +1379,7 @@ function divlog(what, is_error)
     if(is_error)
     {
         what="<span class=\"webrx-error\">"+what+"</span>";
-        if(e("openwebrx-panel-log").openwebrxHidden) toggle_panel("openwebrx-panel-log"); //show panel if any error is present
+        //if(e("openwebrx-panel-log").openwebrxHidden) toggle_panel("openwebrx-panel-log"); //show panel if any error is present
     }
     e("openwebrx-debugdiv").innerHTML+=what+"<br />";
     //var wls=e("openwebrx-log-scroll");
@@ -1697,7 +1697,7 @@ function audio_init()
 
     //https://github.com/0xfe/experiments/blob/master/www/tone/js/sinewave.js
     audio_initialized=1; // only tell on_ws_recv() not to call it again
-
+    audio_initialized_once=1;
 
     //on Chrome v36, createJavaScriptNode has been replaced by createScriptProcessor
     createjsnode_function = (audio_context.createJavaScriptNode == undefined)?audio_context.createScriptProcessor.bind(audio_context):audio_context.createJavaScriptNode.bind(audio_context);
