@@ -1390,6 +1390,7 @@ function divlog(what, is_error)
 
 var audio_context;
 var audio_initialized=0;
+var audio_initialized_once=0; //necessary in order to keep memory from overflowing, on band change
 var volume = 1.0;
 var volumeBeforeMute = 100.0;
 var mute = false;
@@ -1668,15 +1669,17 @@ function audio_preinit()
         audio_buffer_size = 4096 * 2;
     else if(audio_context.sampleRate>44100*4)
         audio_buffer_size = 4096 * 4;
-
-    audio_rebuffer = new sdrjs.Rebuffer(audio_buffer_size,sdrjs.REBUFFER_FIXED);
-    audio_last_output_buffer = new Float32Array(audio_buffer_size);
-
+    if(audio_initialized_once == 0)
+    {
+        audio_rebuffer = new sdrjs.Rebuffer(audio_buffer_size,sdrjs.REBUFFER_FIXED);
+        audio_last_output_buffer = new Float32Array(audio_buffer_size);
+    }
     //we send our setup packet
     parsehash();
 
     audio_calculate_resampling(audio_context.sampleRate);
-    audio_resampler = new sdrjs.RationalResamplerFF(audio_client_resampling_factor,1);
+    if(audio_initialized_once == 0)
+        audio_resampler = new sdrjs.RationalResamplerFF(audio_client_resampling_factor,1);
     ws.send("SET output_rate="+audio_server_output_rate.toString()+" action=start"); //now we'll get AUD packets as well
 
 }
@@ -1741,6 +1744,8 @@ function on_ws_closed()
         audio_node.disconnect();
     }
     catch (dont_care) {
+    audio_rebuffer=0;
+    audio_resampler= 0; //cleanup memory?        
 }    divlog("WebSocket has closed unexpectedly. Reconnectin in a few seconds...", 1);
     //todo reconnect
     setTimeout(openwebrx_init(), 1000);
