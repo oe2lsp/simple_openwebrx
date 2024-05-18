@@ -35,7 +35,7 @@ config_webrx: configuration options for OpenWebRX
 #       https://github.com/simonyiszk/openwebrx/wiki
 
 # ==== Server settings ====
-web_port=8090
+web_port=8073
 server_hostname="localhost" # If this contains an incorrect value, the web UI may freeze on load (it can't open websocket)
 max_clients=20
 
@@ -81,22 +81,22 @@ samp_rate = []
 center_freq =  []
 shown_center_freq = [] #you can change this if you use an upconverter
 sdr_labels=[]
-rf_gain = 15 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
+rf_gain = 20 #in dB. For an RTL-SDR, rf_gain=0 will set the tuner to auto gain mode, else it will be in manual gain mode.
 ppm = 0
 
 ##### START SDR CONFIG ###############
-f=1e6*145
-samp_rate.append(2048000)
+f=145e6
+samp_rate.append(0.5e6)
 center_freq.append(f)
 shown_center_freq.append(f) #you can change this if you use an upconverter
-sdr_labels.append(str(cnt)+" MHz")
-start_rtl_command.append("rtl_sdr -s {samp_rate} -d 1 -f {center_freq} -p {ppm} -g {rf_gain} -".format(rf_gain=rf_gain, center_freq=f, samp_rate=2048000, ppm=ppm))
+sdr_labels.append("145 MHz")
+start_rtl_command.append("cat /dev/zero | csdr_s flowcontrol 2000000 2")
 
 
 ##### END SDR CONFIG ###############
 
 
-format_conversion="csdr_s convert_u8_f"
+format_conversion="csdr_s convert_s16_f"
 
 audio_compression="adpcm" #valid values: "adpcm", "none"
 fft_compression="adpcm" #valid values: "adpcm", "none"
@@ -193,7 +193,7 @@ client_audio_buffer_size = 5
 start_freq = center_freq
 start_mod = "nfm" #nfm, am, lsb, usb, cw
 
-iq_server_port = 9090 #TCP port for ncat to listen on. It will send I/Q data over its connections, for internal use in OpenWebRX. It is only accessible from the localhost by default.
+iq_server_port = 4951 #TCP port for ncat to listen on. It will send I/Q data over its connections, for internal use in OpenWebRX. It is only accessible from the localhost by default.
 
 #access_log = "~/openwebrx_access.log"
 
